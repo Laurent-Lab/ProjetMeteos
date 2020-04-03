@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.OkHttpClient;
@@ -129,26 +130,31 @@ public class MainActivity extends AppCompatActivity {
         JSONObject mainJSON = new JSONObject(bodyReponse);
         JSONArray list = mainJSON.getJSONArray("list");
 
-        Temps[] tempsArray = new Temps[list.length()];
-        ClimatInfo[] climatInfoArray = new ClimatInfo[list.length()];
+        ArrayList<Temps> tempsArray = new ArrayList<Temps>();
+        ArrayList<ClimatInfo> climatInfoArray = new ArrayList<ClimatInfo>();
 
         int i = 0;
         for(i = 0 ; i<list.length() ; i++){
+
             JSONObject elementi = list.getJSONObject(i);
-            tempsArray[i] = parseTemps(elementi);
-            climatInfoArray[i] = parseClimatInfo(elementi);
+            Temps tempsi = parseTemps(elementi);
+
+            //Si Element 0 > 15 je prends
+            if(i == 0){
+
+                if (Integer.valueOf(tempsi.dt_text.substring(11,13))> 15){
+                    tempsArray.add(tempsi);
+                    climatInfoArray.add(parseClimatInfo(elementi));
+                }
+            }
+            //Si temps == 15h je prends
+            if (tempsi.dt_text.substring(11,13).equals(15)) {
+                tempsArray.add(tempsi);
+                climatInfoArray.add(parseClimatInfo(elementi));
+            }
 
         }
-
-        //Element 0
-        JSONObject element0 = list.getJSONObject(0);
-
-        Temps t0 = parseTemps(element0);
-        ClimatInfo i0 = parseClimatInfo(element0);
-
-
-
-
+        int h1 = 1;
     }
 
     private Temps parseTemps(JSONObject element0) throws JSONException {
